@@ -94,6 +94,9 @@ extern int _stricoll(char *a, char *b);
 # include "fold.pro"
 # include "getchar.pro"
 # include "gui_xim.pro"
+# ifdef FEAT_HANGULIN
+#  include "hangulin.pro"
+# endif
 # include "hardcopy.pro"
 # include "hashtab.pro"
 # include "help.pro"
