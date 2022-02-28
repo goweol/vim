@@ -1266,13 +1266,13 @@ gui_update_cursor(
 	if (id > 0)
 	{
 	    cattr = syn_id2colors(id, &cfg, &cbg);
-#if defined(HAVE_INPUT_METHOD)
+#if defined(HAVE_INPUT_METHOD) || defined(FEAT_HANGULIN)
 	    {
 		static int iid;
 		guicolor_T fg, bg;
 
 		if (
-# if defined(FEAT_GUI_GTK) && defined(FEAT_XIM)
+# if defined(FEAT_GUI_GTK) && defined(FEAT_XIM) && !defined(FEAT_HANGULIN)
 			preedit_get_status()
 # else
 			im_get_status()
@@ -1357,13 +1357,34 @@ gui_update_cursor(
     }
 
     old_hl_mask = gui.highlight_mask;
-    if (shape->shape == SHAPE_BLOCK)
+    if (shape->shape == SHAPE_BLOCK
+#ifdef FEAT_HANGULIN
+	|| composing_hangul
+#endif
+       )
     {
 	/*
 	 * Draw the text character with the cursor colors.	Use the
 	 * character attributes plus the cursor attributes.
 	 */
 	gui.highlight_mask = (cattr | attr);
+#ifdef FEAT_HANGULIN
+	if (composing_hangul)
+	{
+	    char_u *comp_buf;
+	    int comp_len;
+
+	    comp_buf = hangul_composing_buffer_get(&comp_len);
+	    if (comp_buf)
+	    {
+		(void)gui_outstr_nowrap(comp_buf, comp_len,
+					GUI_MON_IS_CURSOR | GUI_MON_NOCLEAR,
+					cfg, cbg, 0);
+		vim_free(comp_buf);
+	    }
+	}
+	else
+#endif
 	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
 		GUI_MON_IS_CURSOR | GUI_MON_NOCLEAR, cfg, cbg, 0);
     }
@@ -2724,6 +2745,23 @@ gui_undraw_cursor(void)
 #endif
     gui_redraw_block(gui.cursor_row, startcol,
 	    gui.cursor_row, endcol, GUI_MON_NOCLEAR);
+#ifdef FEAT_HANGULIN
+    if (composing_hangul
+	&& gui.col == gui.cursor_col && gui.row == gui.cursor_row)
+    {
+	char_u *comp_buf;
+	int comp_len;
+
+	comp_buf = hangul_composing_buffer_get(&comp_len);
+	if (comp_buf)
+	{
+	    (void)gui_outstr_nowrap(comp_buf, comp_len,
+				    GUI_MON_IS_CURSOR | GUI_MON_NOCLEAR,
+				    gui.norm_pixel, gui.back_pixel, 0);
+	    vim_free(comp_buf);
+	}
+    }
+#endif
 
     // Cursor_is_valid is reset when the cursor is undrawn, also reset it
     // here in case it wasn't needed to undraw it.

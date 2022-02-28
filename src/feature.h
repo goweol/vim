@@ -415,7 +415,9 @@
 /*
  * +xim			X Input Method.  For entering special languages like
  *			chinese and Japanese.
- *			this is for Unix and VMS only.
+ * +hangul_input	Internal Hangul input method.  Must be included
+ *			through configure: "--enable-hangulin"
+ * Both are for Unix and VMS only.
  */
 #ifndef FEAT_XIM
 // #define FEAT_XIM
@@ -425,7 +427,16 @@
 # define USE_XIM 1		// needed for GTK include files
 #endif
 
-#if defined(FEAT_XIM)
+#ifdef FEAT_HANGULIN
+# define HANGUL_DEFAULT_KEYBOARD 2	/* 2 or 3 bulsik keyboard */
+# define ESC_CHG_TO_ENG_MODE		/* if defined, when ESC pressed,
+					 * turn to english mode
+					 */
+# if defined(FEAT_XIM) && !defined(LINT)
+	Error: You should select only ONE of XIM and HANGUL INPUT
+# endif
+#endif
+#if defined(FEAT_XIM) || defined(FEAT_HANGULIN)
 // # define X_LOCALE			// for OS with incomplete locale
 					// support, like old linux versions.
 #endif

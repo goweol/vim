@@ -496,8 +496,11 @@ CClink = $(CC)
 # XIM - X Input Method.  Special character input support for X11 (Chinese,
 # Japanese, special symbols, etc).  Also needed for dead-key support.
 # When omitted it's automatically enabled for the X-windows GUI.
+# HANGUL - Input Hangul (Korean) language using internal routines.
+# Uncomment one of these when you want to input a multibyte language.
 #CONF_OPT_INPUT = --enable-xim
 #CONF_OPT_INPUT = --disable-xim
+#CONF_OPT_INPUT = --enable-hangulinput
 
 # FONTSET - X fontset support for output of languages with many characters.
 # Uncomment this when you want to output a multibyte language.
@@ -1370,7 +1373,7 @@ OSDEF_CFLAGS = $(PRE_DEFS) $(POST_DEFS)
 LINT_CFLAGS = -DLINT -I. $(PRE_DEFS) $(POST_DEFS) $(ALL_IF_CFLAGS) $(VTERM_CFLAGS) \
 	      -Dinline= -D__extension__= -Dalloca=alloca
 
-LINT_EXTRA = -D"__attribute__(x)="
+LINT_EXTRA = -DHANGUL_INPUT -D"__attribute__(x)="
 
 DEPEND_CFLAGS = -DPROTO -DDEPEND -DFEAT_GUI $(LINT_CFLAGS)
 
@@ -1594,6 +1597,7 @@ SRC =	$(BASIC_SRC) \
 	$(GUI_SRC) \
 	$(TERM_SRC) \
 	$(XDIFF_SRC) \
+	$(HANGULIN_SRC) \
 	$(LUA_SRC) \
 	$(MZSCHEME_SRC) \
 	$(PERL_SRC) \
@@ -1602,7 +1606,7 @@ SRC =	$(BASIC_SRC) \
 	$(RUBY_SRC) \
 	$(WAYLAND_SRC)
 
-EXTRA_SRC = if_lua.c if_mzsch.c auto/if_perl.c \
+EXTRA_SRC = hangulin.c if_lua.c if_mzsch.c auto/if_perl.c \
 	    if_python.c if_python3.c if_tcl.c if_ruby.c \
 	    gui_beval.c netbeans.c job.c channel.c \
 	    $(GRESOURCE_SRC)
@@ -1643,7 +1647,7 @@ ALL_SRC = $(ALL_LOCAL_SRC) $(TERM_SRC) $(XDIFF_SRC)
 # Which files to check with lint.  Select one of these three lines.  ALL_SRC
 # checks more, but may not work well for checking a GUI that wasn't configured.
 # The perl sources also don't work well with lint.
-LINT_SRC = $(BASIC_SRC) $(GUI_SRC) \
+LINT_SRC = $(BASIC_SRC) $(GUI_SRC) $(HANGULIN_SRC) \
 	   $(PYTHON_SRC) $(PYTHON3_SRC) $(TCL_SRC) \
 	   $(NETBEANS_SRC) $(CHANNEL_SRC) $(TERM_SRC)
 #LINT_SRC = $(SRC)
@@ -1697,6 +1701,7 @@ OBJ_COMMON = \
 	objects/hashtab.o \
 	objects/help.o \
 	objects/highlight.o \
+	$(HANGULIN_OBJ) \
 	objects/if_cscope.o \
 	objects/if_xcmdsrv.o \
 	objects/indent.o \
@@ -1976,6 +1981,8 @@ PROTO_FILES = \
 	proto/winclip.pro \
 	proto/window.pro \
 	$(ALL_GUI_PRO)
+
+PROTO_FILES += proto/hangulin.pro
 
 # Default target is making the executable and tools
 all: $(VIMTARGET) $(TOOLS) languages $(GUI_BUNDLE)
@@ -3383,6 +3390,9 @@ objects/gui_xim.o: gui_xim.c
 objects/gui_photon.o: gui_photon.c
 	$(CCC) -o $@ gui_photon.c
 
+objects/hangulin.o: hangulin.c
+	$(CCC) -o $@ hangulin.c
+
 objects/highlight.o: highlight.c
 	$(CCC) -o $@ highlight.c
 
@@ -4502,6 +4512,10 @@ objects/message_test.o: auto/osdef.h message_test.c main.c vim.h protodef.h auto
  option.h beval.h structs.h regexp.h gui.h \
  libvterm/include/vterm.h libvterm/include/vterm_keycodes.h alloc.h \
  ex_cmds.h spell.h proto.h globals.h errors.h message.c
+objects/hangulin.o: hangulin.c vim.h protodef.h auto/config.h feature.h os_unix.h \
+ auto/osdef.h ascii.h keymap.h macros.h option.h beval.h \
+ proto/gui_beval.pro structs.h regexp.h gui.h alloc.h ex_cmds.h spell.h \
+ proto.h globals.h
 objects/if_lua.o: auto/osdef.h if_lua.c vim.h protodef.h auto/config.h feature.h os_unix.h \
  ascii.h keymap.h termdefs.h macros.h option.h beval.h \
  structs.h regexp.h gui.h libvterm/include/vterm.h \

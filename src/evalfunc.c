@@ -7125,6 +7125,13 @@ f_has(typval_T *argvars, typval_T *rettv)
 		0
 #endif
 		},
+	{"hangul_input",
+#ifdef FEAT_HANGULIN
+		1,
+#else
+		0
+#endif
+		},
 	{"insert_expand", 1},
 	{"ipv6",
 #ifdef FEAT_IPV6

@@ -651,6 +651,8 @@ MSGFMT
 INSTALL_TOOL_LANGS
 INSTALL_LANGS
 TAGPRG
+HANGULIN_OBJ
+HANGULIN_SRC
 GUI_X_LIBS
 GUITYPE
 GUI_LIB_LOC
@@ -855,6 +857,7 @@ enable_multibyte
 enable_rightleft
 enable_arabic
 enable_farsi
+enable_hangulinput
 enable_xim
 enable_fontset
 with_wayland
@@ -1537,6 +1540,7 @@ Optional Features:
   --disable-rightleft     Do not include Right-to-Left language support.
   --disable-arabic        Do not include Arabic language support.
   --disable-farsi         Deprecated.
+  --enable-hangulinput    Include Hangul input support.
   --enable-xim            Include XIM input support.
   --enable-fontset        Include X fontset output support.
   --enable-wayland-focus-steal
@@ -9175,6 +9179,20 @@ then :
   enableval=$enable_farsi;
 fi
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking --enable-hangulinput argument" >&5
+printf %s "checking --enable-hangulinput argument... " >&6; }
+# Check whether --enable-hangulinput was given.
+if test "${enable_hangulinput+y}"
+then :
+  enableval=$enable_hangulinput; { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_hangulinput" >&5
+printf "%s\n" "$enable_hangulinput" >&6; }
+else $as_nop
+  enable_hangulinput="no"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_hangulinput" >&5
+$as_echo "$enable_hangulinput" >&6; }
+
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking --enable-xim argument" >&5
 printf %s "checking --enable-xim argument... " >&6; }
@@ -11791,7 +11809,7 @@ rm -rf conftest*
   fi
   CPPFLAGS=$cppflags_save
 
-    if test "$enable_xim" = "auto" -a "x$GUITYPE" != "xNONE" ; then
+    if test "$enable_xim" = "auto" -a "$enable_hangulinput" != "yes" -a "x$GUITYPE" != "xNONE" ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: X GUI selected; xim has been enabled" >&5
 printf "%s\n" "X GUI selected; xim has been enabled" >&6; }
     enable_xim="yes"
@@ -11922,6 +11940,11 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
   CPPFLAGS=$cppflags_save
 fi
 
+if test "x$GUITYPE" = "xNONE" -a "$enable_hangulinput" = "yes"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no GUI selected; hangulinput has been disabled" >&5
+printf "%s\n" "no GUI selected; hangulinput has been disabled" >&6; }
+  enable_hangulinput="no"
+fi
 if test "x$GUITYPE" = "xNONE" -a "$enable_xim" = "yes"; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no GUI selected; xim has been disabled" >&5
 printf "%s\n" "no GUI selected; xim has been disabled" >&6; }
@@ -11955,6 +11978,12 @@ if test "$enable_workshop" = "yes" -a -n "$SKIP_MOTIF"; then
   as_fn_error $? "cannot use workshop without Motif" "$LINENO" 5
 fi
 
+if test "$enable_hangulinput" = "yes"; then
+  printf "%s\n" "#define FEAT_HANGULIN 1" >>confdefs.h
+  HANGULIN_SRC=hangulin.c
+  HANGULIN_OBJ=objects/hangulin.o
+
+fi
 if test "$enable_xim" = "yes"; then
   printf "%s\n" "#define FEAT_XIM 1" >>confdefs.h
 

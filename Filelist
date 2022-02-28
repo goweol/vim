@@ -469,6 +469,7 @@ SRC_ALL =	\
 
 # Source files for Unix-like only.
 SRC_UNIX =	\
+		src/hangulin.c \
 		Makefile \
 		Filelist \
 		README_src.txt \
@@ -526,6 +527,7 @@ SRC_UNIX =	\
 		src/proto/gui_xmdlg.pro \
 		src/proto/gui_x11.pro \
 		src/proto/wayland.pro \
+		src/proto/hangulin.pro \
 		src/proto/if_xcmdsrv.pro \
 		src/proto/os_unix.pro \
 		src/proto/pty.pro \

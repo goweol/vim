@@ -845,6 +845,14 @@ gui_x11_key_hit_cb(
 	len = 0;
 #endif
 
+#ifdef FEAT_HANGULIN
+    if ((key_sym == XK_space) && (ev_press->state & ShiftMask))
+    {
+	hangul_input_state_toggle();
+	goto theend;
+    }
+#endif
+
     if (key_sym == XK_space)
 	string[0] = ' ';	// Otherwise Ctrl-Space doesn't work
 
@@ -1539,6 +1547,9 @@ gui_mch_open(void)
     // changed them)
     highlight_gui_started();		// re-init colors and fonts
 
+#ifdef FEAT_HANGULIN
+    hangul_keyboard_set();
+#endif
 #ifdef FEAT_XIM
     xim_init();
 #endif
