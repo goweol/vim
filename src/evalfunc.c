@@ -7246,6 +7246,13 @@ f_has(typval_T *argvars, typval_T *rettv)
 		0
 #endif
 		},
+	{"hangul_input",
+#ifdef FEAT_HANGULIN
+		1,
+#else
+		0
+#endif
+		},
 	{"iconv",
 #if defined(HAVE_ICONV_H) && defined(USE_ICONV)
 		1

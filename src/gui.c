@@ -2759,6 +2759,22 @@ gui_undraw_cursor(void)
 #endif
     gui_redraw_block(gui.cursor_row, startcol,
 	    gui.cursor_row, endcol, GUI_MON_NOCLEAR);
+#ifdef FEAT_HANGULIN
+    if (composing_hangul
+	&& gui.col == gui.cursor_col && gui.row == gui.cursor_row)
+    {
+	char_u *comp_buf;
+	int comp_len;
+	comp_buf = hangul_composing_buffer_get(&comp_len);
+	if (comp_buf)
+	{
+	    (void)gui_outstr_nowrap(comp_buf, comp_len,
+				    GUI_MON_IS_CURSOR | GUI_MON_NOCLEAR,
+				    gui.norm_pixel, gui.back_pixel, 0);
+	    vim_free(comp_buf);
+	}
+    }
+#endif
 #if defined(FEAT_IMAGE_GDI)
     {
 	int left   = FILL_X(startcol);
