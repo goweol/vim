@@ -1,4 +1,4 @@
 v9.1.1129까지 정상적으로 적용되는 것 확인
 
   $ git checkout -b v9.1.1129/hangulin v9.1.1129
-  $ git cherry-pick 6e00b1f2
+  $ git cherry-pick origin/v9.1.0115/hangulin^0
